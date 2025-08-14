@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sri Lanka Cities Interactive Map</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Sri Lanka Cities Interactive Map</h1>
+            <p>Explore the relative locations and distances between cities in Western Province</p>
+        </header>
+        
+        <div class="map-container">
+            <div class="map" id="map">
+                <!-- Cities will be dynamically added here -->
+            </div>
+            
+            <div class="info-panel" id="infoPanel">
+                <h3>City Information</h3>
+                <div id="cityInfo">
+                    <p>Click on a city to see details</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="controls">
+            <button id="toggleDistances" class="btn">Show Distances</button>
+            <button id="toggleNames" class="btn">Hide Names</button>
+            <button id="toggleConnections" class="btn">Hide Connections</button>
+        </div>
+        <div class="zoom-controls">
+            <button id="zoomOut" class="zoom-btn">−</button>
+            <span id="zoomLevel">100%</span>
+            <button id="zoomIn" class="zoom-btn">+</button>
+            <button id="resetPan" class="zoom-btn reset-btn" title="Reset View">⌂</button>
+        </div>
+        
+        <div class="legend">
+            <h4>Legend</h4>
+            <div class="legend-item">
+                <span class="legend-dot major"></span>
+                <span>Major Cities</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-dot minor"></span>
+                <span>Other Cities</span>
+            </div>
+            <div class="legend-item">
+                <span class="legend-line"></span>
+                <span>Connections (≤10km)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- City data loader -->
+    <script>
+        // City coordinates data loaded from JSON file
+        window.cityData = [
+            {
+                "place": "Akuregoda, Western Province, Sri Lanka",
+                "latitude": 6.8962824,
+                "longitude": 79.9418242,
+                "status": "found"
+            },
+            {
+                "place": "Angulana, Western Province, Sri Lanka",
+                "latitude": 6.799414,
+                "longitude": 79.8731939,
+                "status": "found"
+            },
+            {
+                "place": "Arangala, Western Province, Sri Lanka",
+                "latitude": 6.8922411,
+                "longitude": 79.9653393,
+                "status": "found"
+            },
+            {
+                "place": "Arawwala, Western Province, Sri Lanka",
+                "latitude": 6.831077685210079,
+                "longitude": 79.93510317301401,
+                "status": "found"
+            },
+            {
+                "place": "Bandaragama, Western Province, Sri Lanka",
+                "latitude": 6.7145129,
+                "longitude": 79.9889673,
+                "status": "found"
+            },
+            {
+                "place": "Battaramulla, Western Province, Sri Lanka",
+                "latitude": 6.9021809,
+                "longitude": 79.9195776,
+                "status": "found"
+            },
+            {
+                "place": "Bellanvila, Western Province, Sri Lanka",
+                "latitude": 6.8452291,
+                "longitude": 79.8906632,
+                "status": "found"
+            },
+            {
+                "place": "Bope, Western Province, Sri Lanka",
+                "latitude": 6.8323999,
+                "longitude": 80.1324373,
+                "status": "found"
+            },
+            {
+                "place": "Bokundara, Western Province, Sri Lanka",
+                "latitude": 6.8188861,
+                "longitude": 79.9200381,
+                "status": "found"
+            },
+            {
+                "place": "Boralesgamuwa, Western Province, Sri Lanka",
+                "latitude": 6.8410598,
+                "longitude": 79.9017028,
+                "status": "found"
+            },
+            {
+                "place": "Dampe, Western Province, Sri Lanka",
+                "latitude": 6.8210349,
+                "longitude": 80.0498181,
+                "status": "found"
+            },
+            {
+                "place": "Depanama, Western Province, Sri Lanka",
+                "latitude": 6.856603,
+                "longitude": 79.945244,
+                "status": "found"
+            },
+            {
+                "place": "Diyagama, Western Province, Sri Lanka",
+                "latitude": 6.8103766,
+                "longitude": 79.9953639,
+                "status": "found"
+            },
+            {
+                "place": "Godagama, Western Province, Sri Lanka",
+                "latitude": 6.850694,
+                "longitude": 80.0324106,
+                "status": "found"
+            },
+            {
+                "place": "Gonapola, Western Province, Sri Lanka",
+                "latitude": 6.7638594,
+                "longitude": 80.0130531,
+                "status": "found"
+            },
+            {
+                "place": "Halpita, Western Province, Sri Lanka",
+                "latitude": 6.7824989,
+                "longitude": 79.9509629,
+                "status": "found"
+            },
+            {
+                "place": "Hanwella, Western Province, Sri Lanka",
+                "latitude": 6.9088363,
+                "longitude": 80.0817106,
+                "status": "found"
+            },
+            {
+                "place": "Hokandara, Western Province, Sri Lanka",
+                "latitude": 6.8804849,
+                "longitude": 79.9599002,
+                "status": "found"
+            },
+            {
+                "place": "Homagama, Western Province, Sri Lanka",
+                "latitude": 6.8412384,
+                "longitude": 80.0034457,
+                "status": "found"
+            },
+            {
+                "place": "Kaduwela, Western Province, Sri Lanka",
+                "latitude": 6.9357027,
+                "longitude": 79.9843311,
+                "status": "found"
+            },
+            {
+                "place": "Kahathuduwa, Western Province, Sri Lanka",
+                "latitude": 6.7831285,
+                "longitude": 79.9839654,
+                "status": "found"
+            },
+            {
+                "place": "Kalalgoda, Western Province, Sri Lanka",
+                "latitude": 6.8683248,
+                "longitude": 79.9417996,
+                "status": "found"
+            },
+            {
+                "place": "Kalubowila, Western Province, Sri Lanka",
+                "latitude": 6.866423020885503,
+                "longitude": 79.87729709820145,
+                "status": "found"
+            },
+            {
+                "place": "Katubedda, Western Province, Sri Lanka",
+                "latitude": 6.7974474,
+                "longitude": 79.8885193,
+                "status": "found"
+            },
+            {
+                "place": "Katuwawala, Western Province, Sri Lanka",
+                "latitude": 6.8293956,
+                "longitude": 79.9121048,
+                "status": "found"
+            },
+            {
+                "place": "Kesbewa, Western Province, Sri Lanka",
+                "latitude": 6.7957403,
+                "longitude": 79.940848,
+                "status": "found"
+            },
+            {
+                "place": "Kirulapona, Western Province, Sri Lanka",
+                "latitude": 6.8804598,
+                "longitude": 79.8781754,
+                "status": "found"
+            },
+            {
+                "place": "Kohuwala, Western Province, Sri Lanka",
+                "latitude": 6.8670544,
+                "longitude": 79.8847353,
+                "status": "found"
+            },
+            {
+                "place": "Kolonnawa, Western Province, Sri Lanka",
+                "latitude": 6.9326254,
+                "longitude": 79.8903143,
+                "status": "found"
+            },
+            {
+                "place": "Kotte, Western Province, Sri Lanka",
+                "latitude": 6.8883219,
+                "longitude": 79.9187415,
+                "status": "found"
+            },
+            {
+                "place": "Madapatha, Western Province, Sri Lanka",
+                "latitude": 6.766693,
+                "longitude": 79.9306538,
+                "status": "found"
+            },
+            {
+                "place": "Madiwela, Western Province, Sri Lanka",
+                "latitude": 6.8790077,
+                "longitude": 79.9218458,
+                "status": "found"
+            },
+            {
+                "place": "Magammana, Western Province, Sri Lanka",
+                "latitude": 6.8226329,
+                "longitude": 79.9950432,
+                "status": "found"
+            },
+            {
+                "place": "Maharagama, Western Province, Sri Lanka",
+                "latitude": 6.849022872966672,
+                "longitude": 79.92463676734414,
+                "status": "found"
+            },
+            {
+                "place": "Malabe, Western Province, Sri Lanka",
+                "latitude": 6.9040723,
+                "longitude": 79.9546189,
+                "status": "found"
+            },
+            {
+                "place": "Malapalla, Western Province, Sri Lanka",
+                "latitude": 6.8446676,
+                "longitude": 79.9713029,
+                "status": "found"
+            },
+            {
+                "place": "Makuluduwa, Western Province, Sri Lanka",
+                "latitude": 6.8154738477238705,
+                "longitude": 79.93498307508479,
+                "status": "found"
+            },
+            {
+                "place": "Mattegoda, Western Province, Sri Lanka",
+                "latitude": 6.8121327,
+                "longitude": 79.9746984,
+                "status": "found"
+            },
+            {
+                "place": "Maviththara, Western Province, Sri Lanka",
+                "latitude": 6.8039654,
+                "longitude": 79.9405569,
+                "status": "found"
+            },
+            {
+                "place": "Moratuwa, Western Province, Sri Lanka",
+                "latitude": 6.7746821,
+                "longitude": 79.8826095,
+                "status": "found"
+            },
+            {
+                "place": "Nawala, Western Province, Sri Lanka",
+                "latitude": 6.8952109,
+                "longitude": 79.8905528,
+                "status": "found"
+            },
+            {
+                "place": "Nawagamuwa, Western Province, Sri Lanka",
+                "latitude": 6.924305,
+                "longitude": 80.0184276,
+                "status": "found"
+            },
+            {
+                "place": "Nugegoda, Western Province, Sri Lanka",
+                "latitude": 6.87016934002151,
+                "longitude": 79.88820881183915,
+                "status": "found"
+            },
+            {
+                "place": "Olaboduwa, Western Province, Sri Lanka",
+                "latitude": 6.7706958,
+                "longitude": 80.0266081,
+                "status": "found"
+            },
+            {
+                "place": "Padukka, Western Province, Sri Lanka",
+                "latitude": 6.8415384,
+                "longitude": 80.0916472,
+                "status": "found"
+            },
+            {
+                "place": "Pamunuwa, Western Province, Sri Lanka",
+                "latitude": 6.8491934,
+                "longitude": 79.9288897,
+                "status": "found"
+            },
+            {
+                "place": "Panagoda, Western Province, Sri Lanka",
+                "latitude": 6.8650172,
+                "longitude": 80.0233084,
+                "status": "found"
+            },
+            {
+                "place": "Pelawatta, Western Province, Sri Lanka",
+                "latitude": 6.891963512975194,
+                "longitude": 79.92215587809919,
+                "status": "found"
+            },
+            {
+                "place": "Pelenwatta, Western Province, Sri Lanka",
+                "latitude": 6.82357752750767,
+                "longitude": 79.94398288143312,
+                "status": "found"
+            },
+            {
+                "place": "Piliyandala, Western Province, Sri Lanka",
+                "latitude": 6.7999509,
+                "longitude": 79.9231171,
+                "status": "found"
+            },
+            {
+                "place": "Pita Kotte, Western Province, Sri Lanka",
+                "latitude": 6.8832315,
+                "longitude": 79.9018403,
+                "status": "found"
+            },
+            {
+                "place": "Polgasowita, Western Province, Sri Lanka",
+                "latitude": 6.790000615724533,
+                "longitude": 79.98089394651292,
+                "status": "found"
+            },
+            {
+                "place": "Pothuarawa, Western Province, Sri Lanka",
+                "latitude": 6.8907392,
+                "longitude": 79.9555778,
+                "status": "found"
+            },
+            {
+                "place": "Ranala, Western Province, Sri Lanka",
+                "latitude": 6.9170523,
+                "longitude": 80.0343099,
+                "status": "found"
+            },
+            {
+                "place": "Ratmalana, Western Province, Sri Lanka",
+                "latitude": 6.8197463,
+                "longitude": 79.8682643,
+                "status": "found"
+            },
+            {
+                "place": "Rathmaldeniya, Western Province, Sri Lanka",
+                "latitude": 6.839212732092833,
+                "longitude": 79.9502749962408,
+                "status": "found"
+            },
+            {
+                "place": "Rukmale, Western Province, Sri Lanka",
+                "latitude": 6.8517186,
+                "longitude": 79.961014,
+                "status": "found"
+            },
+            {
+                "place": "Siddamulla, Western Province, Sri Lanka",
+                "latitude": 6.8250391,
+                "longitude": 79.9612712,
+                "status": "found"
+            },
+            {
+                "place": "Thalahena, Western Province, Sri Lanka",
+                "latitude": 6.9083964,
+                "longitude": 79.9447775,
+                "status": "found"
+            },
+            {
+                "place": "Thalawathugoda, Western Province, Sri Lanka",
+                "latitude": 6.8763201,
+                "longitude": 79.9353613,
+                "status": "found"
+            },
+            {
+                "place": "Thunadahena, Western Province, Sri Lanka",
+                "latitude": 6.9080059,
+                "longitude": 79.9848697,
+                "status": "found"
+            },
+            {
+                "place": "Udahamulla, Western Province, Sri Lanka",
+                "latitude": 6.866906324099499,
+                "longitude": 79.91407789824207,
+                "status": "found"
+            },
+            {
+                "place": "Werahera, Western Province, Sri Lanka",
+                "latitude": 6.8270506,
+                "longitude": 79.9057376,
+                "status": "found"
+            },
+            {
+                "place": "Watareka, Western Province, Sri Lanka",
+                "latitude": 6.8431734,
+                "longitude": 80.0598726,
+                "status": "found"
+            },
+            {
+                "place": "Embuldeniya, Western Province, Sri Lanka",
+                "latitude": 6.867569823433227,
+                "longitude": 79.91011138770412,
+                "status": "found"
+            },
+            {
+                "place": "Thalapathpitiya, Western Province, Sri Lanka",
+                "latitude": 6.870243899946686,
+                "longitude": 79.92161902452935,
+                "status": "found"
+            },
+            {
+                "place": "Wijerama, Western Province, Sri Lanka",
+                "latitude": 6.856277592630061,
+                "longitude": 79.90698330847943,
+                "status": "found"
+            },
+            {
+                "place": "Pitipana, Western Province, Sri Lanka",
+                "latitude": 6.834356684511159,
+                "longitude": 80.0243452007749,
+                "status": "found"
+            },
+            {
+                "place": "Welipillawa, Western Province, Sri Lanka",
+                "latitude": 6.883798858694255,
+                "longitude": 80.03014382688798,
+                "status": "found"
+            },
+            {
+                "place": "Mampe, Western Province, Sri Lanka",
+                "latitude": 6.8054573759292705,
+                "longitude": 79.92627687945583,
+                "status": "found"
+            },
+            {
+                "place": "Pannipitiya, Western Province, Sri Lanka",
+                "latitude": 6.846434592993686,
+                "longitude": 79.94835789944167,
+                "status": "found"
+            }
+        ];
+
+        // Initialize the map when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            if (typeof CityMap !== 'undefined') {
+                new CityMap();
+            }
+        });
+    </script>
+    
+    <script src="script.js"></script>
+</body>
+</html>
