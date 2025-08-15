@@ -7,8 +7,8 @@ class CityMap {
         this.showConnections = true;
         this.connections = [];
         this.zoomLevel = 1;
-        this.panX = 0;
-        this.panY = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
         this.isPanning = false;
         this.lastMouseX = 0;
         this.lastMouseY = 0;
@@ -351,48 +351,67 @@ class CityMap {
     }
 
     handleZoom(e) {
-        const zoomSpeed = 0.15;
-        const delta = e.deltaY > 0 ? -zoomSpeed : zoomSpeed;
-        
-        // Calculate new zoom level with limits
-        const newZoom = Math.max(0.3, Math.min(5, this.zoomLevel + delta));
-        
-        if (newZoom !== this.zoomLevel) {
-            this.zoomLevel = newZoom;
-            this.applyZoom();
+        e.preventDefault();
+        const zoomSpeed = 0.1;
+        const delta = e.deltaY > 0 ? -1 : 1;
+        const zoomFactor = 1 + delta * zoomSpeed;
+
+        const oldZoom = this.zoomLevel;
+        const newZoom = Math.max(0.3, Math.min(5, oldZoom * zoomFactor));
+
+        if (newZoom === oldZoom) {
+            return;
         }
+
+        const mapRect = this.mapElement.getBoundingClientRect();
+        const mouseX = e.clientX - mapRect.left;
+        const mouseY = e.clientY - mapRect.top;
+
+        this.offsetX = mouseX - (mouseX - this.offsetX) / oldZoom * newZoom;
+        this.offsetY = mouseY - (mouseY - this.offsetY) / oldZoom * newZoom;
+
+        this.zoomLevel = newZoom;
+        this.applyZoom();
     }
 
     applyZoom() {
-        // Apply zoom and pan to the entire map container
-        this.mapElement.style.transform = `scale(${this.zoomLevel}) translate(${this.panX}px, ${this.panY}px)`;
-        this.mapElement.style.transformOrigin = 'center center';
+        this.mapElement.style.transform = `translate(${this.offsetX}px, ${this.offsetY}px) scale(${this.zoomLevel})`;
+        this.mapElement.style.transformOrigin = '0 0';
         
-        // Update zoom level display
         const zoomDisplay = document.getElementById('zoomLevel');
         if (zoomDisplay) {
             zoomDisplay.textContent = `${Math.round(this.zoomLevel * 100)}%`;
         }
     }
 
-    zoomIn() {
-        const newZoom = Math.min(5, this.zoomLevel + 0.25);
-        if (newZoom !== this.zoomLevel) {
-            this.zoomLevel = newZoom;
-            this.applyZoom();
+    zoom(zoomFactor) {
+        const oldZoom = this.zoomLevel;
+        const newZoom = Math.max(0.3, Math.min(5, this.zoomLevel * zoomFactor));
+
+        if (newZoom === oldZoom) {
+            return;
         }
+
+        const mapRect = this.mapElement.getBoundingClientRect();
+        const centerX = mapRect.width / 2;
+        const centerY = mapRect.height / 2;
+
+        this.offsetX = centerX - (centerX - this.offsetX) / oldZoom * newZoom;
+        this.offsetY = centerY - (centerY - this.offsetY) / oldZoom * newZoom;
+
+        this.zoomLevel = newZoom;
+        this.applyZoom();
+    }
+
+    zoomIn() {
+        this.zoom(1.25);
     }
 
     zoomOut() {
-        const newZoom = Math.max(0.3, this.zoomLevel - 0.25);
-        if (newZoom !== this.zoomLevel) {
-            this.zoomLevel = newZoom;
-            this.applyZoom();
-        }
+        this.zoom(0.8);
     }
 
     startPan(e) {
-        // Only start panning on left mouse button
         if (e.button === 0) {
             this.isPanning = true;
             this.lastMouseX = e.clientX;
@@ -407,8 +426,8 @@ class CityMap {
         const deltaX = e.clientX - this.lastMouseX;
         const deltaY = e.clientY - this.lastMouseY;
         
-        this.panX += deltaX;
-        this.panY += deltaY;
+        this.offsetX += deltaX;
+        this.offsetY += deltaY;
         
         this.lastMouseX = e.clientX;
         this.lastMouseY = e.clientY;
@@ -422,8 +441,8 @@ class CityMap {
     }
 
     resetPan() {
-        this.panX = 0;
-        this.panY = 0;
+        this.offsetX = 0;
+        this.offsetY = 0;
         this.zoomLevel = 1;
         this.applyZoom();
     }
