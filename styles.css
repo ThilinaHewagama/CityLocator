@@ -18,6 +18,7 @@ body {
     height: 100vh;
     margin: 0;
     padding: 0;
+    position: relative;
 }
 
 header {
@@ -184,12 +185,17 @@ header p {
 
 .controls {
     position: absolute;
-    top: 20px;
-    right: 380px;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
     display: flex;
     gap: 15px;
-    flex-wrap: wrap;
     z-index: 100;
+    background: rgba(255, 255, 255, 0.8);
+    padding: 10px 20px;
+    border-radius: 30px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
 }
 
 .btn {
