@@ -303,7 +303,7 @@ class CityMap {
             label.style.opacity = this.showDistances ? '1' : '0';
         });
         
-        this.toggleDistancesBtn.textContent = this.showDistances ? 'Hide Distances' : 'Show Distances';
+        this.toggleDistancesBtn.textContent = this.showDistances ? '↔️ Hide Distances' : '↔️ Show Distances';
     }
 
     toggleNames() {
@@ -319,7 +319,7 @@ class CityMap {
             }
         });
         
-        this.toggleNamesBtn.textContent = this.showNames ? 'Hide Names' : 'Show Names';
+        this.toggleNamesBtn.textContent = this.showNames ? '🏷️ Hide Names' : '🏷️ Show Names';
     }
 
     toggleConnections() {
@@ -329,7 +329,7 @@ class CityMap {
             connection.style.display = this.showConnections ? 'block' : 'none';
         });
         
-        this.toggleConnectionsBtn.textContent = this.showConnections ? 'Hide Connections' : 'Show Connections';
+        this.toggleConnectionsBtn.textContent = this.showConnections ? '🔗 Hide Connections' : '🔗 Show Connections';
     }
 
     showNodeConnections(city, show) {
